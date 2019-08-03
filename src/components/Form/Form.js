@@ -31,6 +31,9 @@ export default class Form extends React.Component {
 
             if (inputValue.toLowerCase() !== config[field].value) {
                 errors[field] = (inputValue === '') ? config[field].error.empty : config[field].error.wrong;
+
+                // Focus on the highest input
+                if (Object.keys(errors).length === 1) document.querySelector(`.t-input-${field.toLowerCase()}`).focus()
             }
             else {
                 delete errors[field];
