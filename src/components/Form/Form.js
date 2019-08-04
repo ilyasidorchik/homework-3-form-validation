@@ -9,12 +9,19 @@ const config = {
 };
 
 export default class Form extends React.Component {
-    state = {
-        firstName: "",
-        lastName: "",
-        password: "",
-        errors: {},
-        validate: false
+    constructor(props) {
+        super(props);
+        this.state = {
+            firstName: "",
+            lastName: "",
+            password: "",
+            errors: {},
+            validate: false
+        };
+        this.firstNameInput = React.createRef();
+        this.lastNameInput = React.createRef();
+        this.passwordInput = React.createRef();
+        this.focusTextInput = this.focusTextInput.bind(this);
     }
 
     handleInputChange = (event) => {
@@ -33,7 +40,7 @@ export default class Form extends React.Component {
                 errors[field] = (inputValue === '') ? config[field].error.empty : config[field].error.wrong;
 
                 // Focus on the highest input
-                if (Object.keys(errors).length === 1) document.querySelector(`.t-input-${field.toLowerCase()}`).focus()
+                if (Object.keys(errors).length === 1) this.focusTextInput(field);
             }
             else {
                 delete errors[field];
@@ -43,8 +50,12 @@ export default class Form extends React.Component {
         this.setState({ errors, validate: Object.keys(errors).length === 0 });
     }
 
+    focusTextInput(field) {
+        this[field + 'Input'].current.focus();
+    }
+
     render() {
-        const {firstName, lastName, password, errors, validate} = this.state;
+        const { firstName, lastName, password, errors, validate } = this.state;
 
         if (validate) {
             return (
@@ -62,21 +73,21 @@ export default class Form extends React.Component {
                         <label className="field__label">
                             <span className="field-label">Имя</span>
                         </label>
-                        <input type="text" name="firstName" value={firstName} className="field__input field-input t-input-firstname" onChange={this.handleInputChange} />
+                        <input type="text" name="firstName" value={firstName} className="field__input field-input t-input-firstname" onChange={this.handleInputChange} ref={this.firstNameInput}/>
                         <span className="field__error field-error t-error-firstname">{errors.firstName}</span>
                     </p>
                     <p className="field">
                         <label className="field__label">
                             <span className="field-label">Фамилия</span>
                         </label>
-                        <input type="text" name="lastName" value={lastName} className="field__input field-input t-input-lastname" onChange={this.handleInputChange} />
+                        <input type="text" name="lastName" value={lastName} className="field__input field-input t-input-lastname" onChange={this.handleInputChange} ref={this.lastNameInput} />
                         <span className="field__error field-error t-error-lastname">{errors.lastName}</span>
                     </p>
                     <p className="field">
                         <label className="field__label">
                             <span className="field-label">Пароль</span>
                         </label>
-                        <input type="password" name="password" value={password} className="field__input field-input t-input-password" onChange={this.handleInputChange} />
+                        <input type="password" name="password" value={password} className="field__input field-input t-input-password" onChange={this.handleInputChange} ref={this.passwordInput} />
                         <span className="field__error field-error t-error-password">{errors.password}</span>
                     </p>
                     <div className="form__buttons">
