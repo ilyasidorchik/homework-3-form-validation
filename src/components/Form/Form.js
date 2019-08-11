@@ -1,4 +1,5 @@
-import React from 'react';
+/* eslint-disable max-statements */
+import React, { useState } from 'react';
 import './Form.css';
 import imgBondApprove from './assets/bond_approve.jpg'
 
@@ -8,93 +9,84 @@ const config = {
     password: { value: '007', error: { empty: 'Нужно указать пароль', wrong: 'Пароль указан не верно' } }
 };
 
-export default class Form extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            firstName: "",
-            lastName: "",
-            password: "",
-            errors: {},
-            validate: false
-        };
-        this.firstNameInput = React.createRef();
-        this.lastNameInput = React.createRef();
-        this.passwordInput = React.createRef();
-        this.focusTextInput = this.focusTextInput.bind(this);
-    }
+const Form = () => {
+    const [values, setValues] = useState({ firstName: '', lastName: '', password: '' });
+    const [errors, setErrors] = useState({});
+    const [isValidate, setIsValidate] = useState(false);
 
-    handleInputChange = (event) => {
-        this.setState({ [event.target.name]: event.target.value, errors: {} });
-    }
+    let firstNameInput = React.createRef();
+    let lastNameInput = React.createRef();
+    let passwordInput = React.createRef();
 
-    handleSubmit = (event) => {
+    const handleInputChange = (event) => {
+        setValues({ ...values, ...{ [event.target.name]: event.target.value } });
+        setErrors({});
+    };
+
+    const handleSubmit = (event) => {
         event.preventDefault();
 
-        const { errors } = this.state;
-
         Object.keys(config).forEach(field => {
-            const inputValue = this.state[field];
+            const inputValue = values[field];
 
             if (inputValue.toLowerCase() !== config[field].value) {
                 errors[field] = (inputValue === '') ? config[field].error.empty : config[field].error.wrong;
 
                 // Focus on the highest input
-                if (Object.keys(errors).length === 1) this.focusTextInput(field);
+                if (Object.keys(errors).length === 1) focusTextInput(field);
             }
             else {
                 delete errors[field];
             }
         });
 
-        this.setState({ errors, validate: Object.keys(errors).length === 0 });
+        setIsValidate(Object.keys(errors).length === 0);
+        setErrors(errors);
     }
 
-    focusTextInput(field) {
+    const focusTextInput = (field) => {
         this[field + 'Input'].current.focus();
-    }
+    };
 
-    render() {
-        const { firstName, lastName, password, errors, validate } = this.state;
-
-        if (validate) {
-            return (
-                <img
-                    src={imgBondApprove}
-                    alt="Bond Approve"
-                    className="t-bond-image"/>
-            );
-        }
-        else {
-            return (
-                <form className="form" onSubmit={this.handleSubmit}>
-                    <h1>Введите свои данные, агент</h1>
-                    <p className="field">
-                        <label className="field__label">
-                            <span className="field-label">Имя</span>
-                        </label>
-                        <input type="text" name="firstName" value={firstName} className="field__input field-input t-input-firstname" onChange={this.handleInputChange} ref={this.firstNameInput}/>
-                        <span className="field__error field-error t-error-firstname">{errors.firstName}</span>
-                    </p>
-                    <p className="field">
-                        <label className="field__label">
-                            <span className="field-label">Фамилия</span>
-                        </label>
-                        <input type="text" name="lastName" value={lastName} className="field__input field-input t-input-lastname" onChange={this.handleInputChange} ref={this.lastNameInput} />
-                        <span className="field__error field-error t-error-lastname">{errors.lastName}</span>
-                    </p>
-                    <p className="field">
-                        <label className="field__label">
-                            <span className="field-label">Пароль</span>
-                        </label>
-                        <input type="password" name="password" value={password} className="field__input field-input t-input-password" onChange={this.handleInputChange} ref={this.passwordInput} />
-                        <span className="field__error field-error t-error-password">{errors.password}</span>
-                    </p>
-                    <div className="form__buttons">
-                        <input type="submit" value="Проверить" className="button t-submit" />
-                    </div>
-                </form>
-            );
-        }
+    if (isValidate) {
+        return (
+            <img
+                src={imgBondApprove}
+                alt="Bond Approve"
+                className="t-bond-image"/>
+        );
     }
-}
+    else {
+        return (
+            <form className="form" onSubmit={handleSubmit}>
+                <h1>Введите свои данные, агент</h1>
+                <p className="field">
+                    <label className="field__label">
+                        <span className="field-label">Имя</span>
+                    </label>
+                    <input type="text" name="firstName" value={values.firstName} className="field__input field-input t-input-firstname" onChange={handleInputChange} ref={firstNameInput} />
+                    <span className="field__error field-error t-error-firstname">{errors.firstName}</span>
+                </p>
+                <p className="field">
+                    <label className="field__label">
+                        <span className="field-label">Фамилия</span>
+                    </label>
+                    <input type="text" name="lastName" value={values.lastName} className="field__input field-input t-input-lastname" onChange={handleInputChange} ref={lastNameInput} />
+                    <span className="field__error field-error t-error-lastname">{errors.lastName}</span>
+                </p>
+                <p className="field">
+                    <label className="field__label">
+                        <span className="field-label">Пароль</span>
+                    </label>
+                    <input type="password" name="password" value={values.password} className="field__input field-input t-input-password" onChange={handleInputChange} ref={passwordInput} />
+                    <span className="field__error field-error t-error-password">{errors.password}</span>
+                </p>
+                <div className="form__buttons">
+                    <input type="submit" value="Проверить" className="button t-submit" />
+                </div>
+            </form>
+        );
+    }
+};
+
+export default Form;
